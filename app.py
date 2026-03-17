@@ -1,7 +1,5 @@
 import streamlit as st
 import requests
-import os
-from dotenv import load_dotenv
 from datetime import datetime
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
