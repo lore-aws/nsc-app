@@ -4,8 +4,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 
-load_dotenv(dotenv_path=".env")
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
+API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 
 # -------------------------
 # FUNCTIES
