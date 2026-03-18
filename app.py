@@ -90,7 +90,7 @@ if location:
             st.subheader(f"Actueel in {name}")
             curr_dt = datetime.fromtimestamp(current["dt"])
             curr_night_min = get_night_min(forecast_list, curr_dt)
-            risk, color = nsc_risk(current["clouds"]["all"], curr_night_min, curr_dt.hour)
+            risk, color = nsc_risk(current["clouds"]["all"], curr_night_min, curr_dt.hour, current["main"]["humidity"], current["main"]["temp"])
 
             # Belangrijkste huidige stats in kolommen
             col1, col2, col3 = st.columns(3)
