@@ -60,8 +60,8 @@ def nsc_risk(cloud_cover, night_temp, hour, humidity, temp_current):
         score -= 2  # Veiligste moment: vlak na zonsopgang
 
     # Risico bepaling (schaal is nu ruimer door extra factoren)
-    if score <= 1: return "Laag risico", "green"
-    elif score <= 4: return "Risico", "orange"
+    if score <= 3: return "Laag risico", "green"
+    elif score <= 6: return "Risico", "orange"
     else: return "Hoog risico", "red"
 
 # -------------------------
