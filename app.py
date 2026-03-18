@@ -97,8 +97,7 @@ if location:
                 table_data.append({
                     "Tijdstip": dt.strftime('%a %H:%M'),
                     "NSC Risico": f"{emoji} {f_risk}",
-                    "Temp": f"{item['main']['temp']:.1f}°C",
-                    "Nacht Min": f"{night_min:.1f}°C",
+                    "Temperatuur": f"{item['main']['temp']:.1f}°C",
                     "Wolken": f"{item['clouds']['all']}%"
                 })
             
