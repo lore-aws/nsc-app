@@ -119,7 +119,7 @@ if location:
                 emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
                 
                 table_data.append({
-                    "Tijdstip": dt.strftime('%H:%M'),
+                    "Tijdstip": dt.strftime('%Hu%M'),
                     "NSC Risico": f"{emoji} {f_risk}",
                     "Temp": f"{item['main']['temp']:.1f}°C",
                     "Wolken": f"{item['clouds']['all']}%"
