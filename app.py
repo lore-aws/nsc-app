@@ -126,10 +126,10 @@ if location:
                 })
 
             # Zet de lijst om naar een DataFrame
-            df = pd.DataFrame(table_data, hide_index = True)
+            df = pd.DataFrame(table_data)
 
             # Toon de tabel zonder rijnummers
-            st.table(df)
+            st.dataframe(df, hide_index = True)
             st.divider()
             st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
         else:
