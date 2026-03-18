@@ -123,3 +123,6 @@ if location:
                     st.write(f"{dt.strftime('%H:%M')} | {emoji} **{f_risk}** | Temperatuur: {f_temp:.1f}°C | Bewolking: {f_cloud}%")
             else:
                 st.info("Voorspelling kon niet worden geladen.")
+
+            st.divider()
+            st.info("Deze voorspelling is een indicatie op basis van huidige weersomstandigheden en is geen garantie. Observeer je paarden goed en schat in of ze kunnen grazen.")
