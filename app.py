@@ -98,7 +98,7 @@ if location:
                 elif color == "orange":
                     st.warning(f"**{risk}**\n\nLet op met gevoelige paarden.")
                 else:
-                    st.error(f"**{risk}**\n\nBeter nu niet grazen.")
+                    st.error(f"**{risk}**\n\nBeperk grazen.")
 
             # --- VOORSPELLING VOOR KOMENDE UREN ---
             st.divider()
@@ -120,6 +120,6 @@ if location:
                     # Kleur-emoji voor de lijst
                     emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
                     
-                    st.write(f"{dt.strftime('%H:%M')} | {emoji} **{f_risk}** | Temp: {f_temp:.1f}°C | Wolken: {f_cloud}%")
+                    st.write(f"{dt.strftime('%H:%M')} | {emoji} **{f_risk}** | Temperatuur: {f_temp:.1f}°C | Bewolking: {f_cloud}%")
             else:
                 st.info("Voorspelling kon niet worden geladen.")
