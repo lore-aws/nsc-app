@@ -15,7 +15,7 @@ def geocode(location):
 
 def get_weather_data(lat, lon):
     # We halen de 5-daagse voorspelling op (bevat alle data die we nodig hebben)
-    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon Marc}&appid={API_KEY}&units=metric"
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
     return requests.get(url).json()
 
 def get_night_min(forecast_list, target_date):
