@@ -62,7 +62,7 @@ def nsc_risk(cloud_cover, night_temp, hour, humidity, temp_current):
 
     # Risico bepaling (schaal is nu ruimer door extra factoren)
     if score <= 4: return "Laag risico", "green"
-    elif score <= 7: return "Risico voor\ngevoelige paarden", "orange"
+    elif score <= 7: return "Matig risico", "orange"
     else: return "Hoog risico", "red"
 
 # -------------------------
@@ -98,7 +98,7 @@ if location:
             col1.metric("Temperatuur", f"{current['main']['temp']:.1f}°C")
             col2.metric("Minimale temperatuur afgelopen nacht", f"{curr_night_min:.1f}°C")
             col3.metric("Bewolking", f"{current['clouds']['all']}%")
-            col4.metric("Risiconiveau", f"{risk}")
+            col4.metric("Risiconiveau", f"{risk}", help = "Let op voor gevoelige paarden!")
             
             # --- TABEL VOORSPELLING ---
             st.divider()
