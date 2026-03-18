@@ -78,8 +78,12 @@ if location:
             curr_dt = datetime.fromtimestamp(current["dt"])
             curr_night_min = get_night_min(forecast_list, curr_dt)
             risk, color = nsc_risk(current["clouds"]["all"], curr_night_min, curr_dt.hour)
-            
-            st.select_slider("Huidig Risico Niveau", options=["Laag risico", "Risico", "Hoog risico"], value=risk, disabled=True)
+
+            # Belangrijkste huidige stats in kolommen
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Temperatuur", f"{current['main']['temp']:.1f}°C")
+            col2.metric("Minimale temperatuur afgelopen nacht", f"{curr_night_min:.1f}°C")
+            col3.metric("Bewolking", f"{current['clouds']['all']}%")
             
             # --- TABEL VOORSPELLING ---
             st.divider()
@@ -98,7 +102,7 @@ if location:
                     "Tijdstip": dt.strftime('%a %H:%M'),
                     "NSC Risico": f"{emoji} {f_risk}",
                     "Temperatuur": f"{item['main']['temp']:.1f}°C",
-                    "Wolken": f"{item['clouds']['all']}%"
+                    "Bewolking": f"{item['clouds']['all']}%"
                 })
             
             st.table(table_data)
