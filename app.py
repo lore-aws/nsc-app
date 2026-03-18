@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import pandas as pd
 from datetime import datetime, timedelta
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
@@ -101,27 +102,34 @@ if location:
             # --- TABEL VOORSPELLING ---
             st.divider()
             st.subheader("Voorspelling komende 24 uur")
-            
+
             table_data = []
-            # We tonen de komende 8 blokken (24 uur)
             for item in forecast_list[:9]:
                 dt = datetime.fromtimestamp(item["dt"])
                 night_min = get_night_min(forecast_list, dt)
-                # In de for-loop:
-                f_hum = item["main"]["humidity"]
-                f_temp = item["main"]["temp"]
-                f_risk, f_color = nsc_risk(item["clouds"]["all"], night_min, dt.hour, f_hum, f_temp)
+                
+                f_risk, f_color = nsc_risk(
+                    item["clouds"]["all"], 
+                    night_min, 
+                    dt.hour, 
+                    item["main"]["humidity"], 
+                    item["main"]["temp"]
+                )
                 
                 emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
                 
                 table_data.append({
-                    "Tijdstip": dt.strftime('%Hu%M'),
+                    "Tijdstip": dt.strftime('%H:%M'),
                     "NSC Risico": f"{emoji} {f_risk}",
-                    "Temperatuur": f"{item['main']['temp']:.1f}°C",
-                    "Bewolking": f"{item['clouds']['all']}%"
+                    "Temp": f"{item['main']['temp']:.1f}°C",
+                    "Wolken": f"{item['clouds']['all']}%"
                 })
-            
-            st.table(table_data)
+
+            # Zet de lijst om naar een DataFrame
+            df = pd.DataFrame(table_data)
+
+            # Toon de tabel zonder rijnummers
+            st.table(df)
             st.divider()
             st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
         else:
