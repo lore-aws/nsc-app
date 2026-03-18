@@ -102,7 +102,7 @@ if location:
 
             # --- VOORSPELLING VOOR KOMENDE UREN ---
             st.divider()
-            st.subheader("📅 Voorspelling komende 24 uur")
+            st.subheader("Voorspelling komende 24 uur")
             
             forecast_data = get_forecast(lat, lon)
             
