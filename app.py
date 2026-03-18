@@ -1,12 +1,6 @@
 import streamlit as st
 import requests
-import locale
 from datetime import datetime, timedelta
-
-try:    locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
-except locale.Error:
-    print("Nederlandse locale niet beschikbaar op dit systeem.")
-    exit(1)
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 
@@ -105,7 +99,7 @@ if location:
                 emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
                 
                 table_data.append({
-                    "Tijdstip": dt.strftime('%a %H:%M'),
+                    "Tijdstip": dt.strftime('%Hu%M'),
                     "NSC Risico": f"{emoji} {f_risk}",
                     "Temperatuur": f"{item['main']['temp']:.1f}°C",
                     "Bewolking": f"{item['clouds']['all']}%"
