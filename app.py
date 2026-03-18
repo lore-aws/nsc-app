@@ -123,7 +123,7 @@ if location:
                     "Tijdstip": dt.strftime('%Hu%M'),
                     "NSC Risico": f"{emoji} {f_risk}",
                     "Temperatuur": f"{item['main']['temp']:.1f}°C",
-                    "Wolken": f"{item['clouds']['all']}%"
+                    "Bewolking": f"{item['clouds']['all']}%"
                 })
 
             # Zet de lijst om naar een DataFrame
