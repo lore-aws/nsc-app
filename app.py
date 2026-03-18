@@ -125,4 +125,4 @@ if location:
                 st.info("Voorspelling kon niet worden geladen.")
 
             st.divider()
-            st.info("Deze voorspelling is een indicatie op basis van huidige weersomstandigheden en is geen garantie. Observeer je paarden goed en schat in of ze kunnen grazen.")
+            st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
