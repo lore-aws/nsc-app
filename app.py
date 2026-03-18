@@ -29,25 +29,38 @@ def get_night_min(forecast_list, target_date):
     
     return min(night_temps) if night_temps else 7  # 7 is een veilige aanname als data ontbreekt
 
-def nsc_risk(cloud_cover, night_temp, hour):
+def nsc_risk(cloud_cover, night_temp, hour, humidity, temp_current):
     score = 0
     sun_factor = 1 - (cloud_cover / 100)
 
-    # 1. Zonlicht factor (Suikeropbouw)
-    if sun_factor > 0.7: score += 2
-    elif sun_factor > 0.4: score += 1
+    # 1. ZONLICHT & TEMP (Productie)
+    # Veel zon bij een gematigde temperatuur (10-25°C) geeft maximale assimilatie
+    if sun_factor > 0.7:
+        score += 3
+    elif sun_factor > 0.4:
+        score += 1
 
-    # 2. Nachttemperatuur (Suikerverbruik)
-    if night_temp < 5: score += 2    # Vorst/kou: suiker blijft in het gras
-    elif night_temp < 10: score += 1
-    else: score -= 1                 # Warme nacht: gras verbruikt suikers om te groeien
+    # 2. NACHTTEMPERATUUR (Verbruik)
+    if night_temp <= 0:
+        score += 4  # Extreem risico: suikers "bevroren" in het blad
+    elif night_temp < 5:
+        score += 2
+    elif night_temp > 12:
+        score -= 2  # Warme nacht = veel verbruik = veiliger gras
 
-    # 3. Tijdstip (Dagcyclus)
-    if 12 <= hour <= 18: score += 2  # Hoogste concentratie in de middag
-    elif 8 <= hour < 12: score += 1
-    elif 0 <= hour < 6: score -= 1   # Laagste concentratie vlak voor zonsopgang
+    # 3. WATERSTRESS (Indicator via luchtvochtigheid)
+    # Lage luchtvochtigheid + hoge temp = groeistop = suikerophoping
+    if humidity < 40 and temp_current > 20:
+        score += 2
 
-    if score <= 2: return "Laag risico", "green"
+    # 4. TIJDSTIP (Cumulatief effect)
+    if 14 <= hour <= 19:
+        score += 2  # Piek aan het einde van de middag
+    elif 4 <= hour <= 8:
+        score -= 2  # Veiligste moment: vlak na zonsopgang
+
+    # Risico bepaling (schaal is nu ruimer door extra factoren)
+    if score <= 1: return "Laag risico", "green"
     elif score <= 4: return "Risico", "orange"
     else: return "Hoog risico", "red"
 
@@ -94,7 +107,10 @@ if location:
             for item in forecast_list[:9]:
                 dt = datetime.fromtimestamp(item["dt"])
                 night_min = get_night_min(forecast_list, dt)
-                f_risk, f_color = nsc_risk(item["clouds"]["all"], night_min, dt.hour)
+                # In de for-loop:
+                f_hum = item["main"]["humidity"]
+                f_temp = item["main"]["temp"]
+                f_risk, f_color = nsc_risk(item["clouds"]["all"], night_min, dt.hour, f_hum, f_temp)
                 
                 emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
                 
