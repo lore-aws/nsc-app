@@ -62,7 +62,7 @@ def nsc_risk(cloud_cover, night_temp, hour, humidity, temp_current):
 
     # Risico bepaling (schaal is nu ruimer door extra factoren)
     if score <= 4: return "Laag risico", "green"
-    elif score <= 7: return "Risico", "orange"
+    elif score <= 7: return "Risico voor\ngevoelige paarden", "orange"
     else: return "Hoog risico", "red"
 
 # -------------------------
