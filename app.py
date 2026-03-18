@@ -94,7 +94,7 @@ if location:
             risk, color = nsc_risk(current["clouds"]["all"], curr_night_min, curr_dt.hour, current["main"]["humidity"], current["main"]["temp"])
 
             # Belangrijkste huidige stats in kolommen
-            col1, col2, col3, col4 = st.columns([1, 2, 1, 1], use_container_width=True)
+            col1, col2, col3, col4 = st.columns([1, 2, 1, 1])
             col1.metric("Temperatuur", f"{current['main']['temp']:.1f}°C")
             col2.metric("Minimale temperatuur afgelopen nacht", f"{curr_night_min:.1f}°C")
             col3.metric("Bewolking", f"{current['clouds']['all']}%")
