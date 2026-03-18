@@ -126,7 +126,7 @@ if location:
                 })
 
             # Zet de lijst om naar een DataFrame
-            df = pd.DataFrame(table_data)
+            df = pd.DataFrame(table_data, hide_index = True)
 
             # Toon de tabel zonder rijnummers
             st.table(df)
