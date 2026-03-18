@@ -47,8 +47,8 @@ def nsc_risk(cloud_cover, night_temp, hour):
     elif 8 <= hour < 12: score += 1
     elif 0 <= hour < 6: score -= 1   # Laagste concentratie vlak voor zonsopgang
 
-    if score <= 1: return "Laag risico", "green"
-    elif score <= 3: return "Risico", "orange"
+    if score <= 2: return "Laag risico", "green"
+    elif score <= 4: return "Risico", "orange"
     else: return "Hoog risico", "red"
 
 # -------------------------
