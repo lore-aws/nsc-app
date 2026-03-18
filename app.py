@@ -122,6 +122,7 @@ if location:
                 })
             
             st.table(table_data)
+            st.divider()
             st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
         else:
             st.error("Kon geen weerdata ophalen.")
