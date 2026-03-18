@@ -24,7 +24,7 @@ def get_night_min(forecast_list, target_date):
     for item in forecast_list:
         dt = datetime.fromtimestamp(item["dt"])
         # We kijken naar temperaturen tussen 00:00 en 07:00 van de betreffende dag
-        if dt.date() == target_date.date() and 0 <= dt.hour <= 7:
+        if dt.date() == target_date.date() and 0 <= dt.hour <= 6:
             night_temps.append(item["main"]["temp_min"])
     
     return min(night_temps) if night_temps else 7  # 7 is een veilige aanname als data ontbreekt
