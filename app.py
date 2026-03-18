@@ -57,9 +57,9 @@ def nsc_risk(cloud_cover, night_temp, hour):
 
 st.set_page_config(page_title="NSC Gras Monitor", page_icon="🌱")
 st.title("🌱 NSC Risico Monitor")
-st.caption("Voorspelling van suikergehalte in gras op basis van weerdata.")
+st.caption("Schatting van suikergehalte in gras op basis van weerdata.")
 
-location = st.text_input("Locatie", placeholder="Bv. Brussel of Utrecht")
+location = st.text_input("Locatie", placeholder="Bv. Brussel")
 
 if location:
     geo = geocode(location)
@@ -83,7 +83,7 @@ if location:
             
             # --- TABEL VOORSPELLING ---
             st.divider()
-            st.subheader("📅 Voorspelling komende 24 uur")
+            st.subheader("Voorspelling komende 24 uur")
             
             table_data = []
             # We tonen de komende 8 blokken (24 uur)
@@ -103,6 +103,6 @@ if location:
                 })
             
             st.table(table_data)
-            st.info("**Uitleg:** Een koude nacht (< 5°C) gecombineerd met een zonnige dag zorgt voor het hoogste risico, omdat het gras wel suiker aanmaakt maar niet verbruikt om te groeien.")
+            st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
         else:
             st.error("Kon geen weerdata ophalen.")
