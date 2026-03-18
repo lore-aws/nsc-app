@@ -4,7 +4,9 @@ import locale
 from datetime import datetime, timedelta
 
 try:    locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
-except: locale.Error: pass  # Fallback als de locale niet beschikbaar is (bv. op Windows)
+except locale.Error:
+    print("Nederlandse locale niet beschikbaar op dit systeem.")
+    exit(1)
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 
