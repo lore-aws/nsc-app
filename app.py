@@ -60,7 +60,7 @@ def nsc_risk(cloud_cover, night_temp, hour):
 st.set_page_config(page_title="NSC Gras Monitor", page_icon="🌱")
 st.title("🌱 NSC Risico in Gras")
 
-location = st.text_input("Geef een locatie in (bv. Brussel)", placeholder="Utrecht, NL")
+location = st.text_input("Geef een locatie in (bv. Brussel)", placeholder="Peer, BE")
 
 if location:
     geo = geocode(location)
