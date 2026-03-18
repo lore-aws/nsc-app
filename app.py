@@ -107,22 +107,33 @@ if location:
             forecast_data = get_forecast(lat, lon)
             
             if forecast_data.get("cod") == "200":
-                # We pakken de eerste 8 datapunten (8 x 3 uur = 24 uur)
+                forecast_list = []
+                
+                # We pakken de eerste 8 datapunten (24 uur)
                 for item in forecast_data["list"][:8]:
                     dt = datetime.fromtimestamp(item["dt"])
                     f_hour = dt.hour
                     f_temp = item["main"]["temp"]
                     f_cloud = item["clouds"]["all"]
                     
-                    # Bereken risico voor dat tijdstip
+                    # Bereken risico
                     f_risk, f_color = nsc_risk(f_cloud, night_temp, f_hour)
                     
-                    # Kleur-emoji voor de lijst
+                    # Voeg emoji toe aan de tekst voor de tabel
                     emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
                     
-                    st.write(f"{dt.strftime('%H:%M')} | {emoji} **{f_risk}** | Temperatuur: {f_temp:.1f}°C | Bewolking: {f_cloud}%")
+                    # Maak een rij voor de tabel
+                    forecast_list.append({
+                        "Tijdstip": dt.strftime('%H:%M'),
+                        "Risico": f"{emoji} {f_risk}",
+                        "Temp (°C)": f"{f_temp:.1f}",
+                        "Bewolking (%)": f_cloud
+                    })
+
+                # Toon de tabel in Streamlit
+                st.table(forecast_list)
             else:
-                st.info("Voorspelling kon niet worden geladen.")
+                st.error("Kon de voorspelling niet ophalen.")
 
             st.divider()
             st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
