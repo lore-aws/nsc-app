@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
+import locale
 from datetime import datetime, timedelta
+
+try:    locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
+except: locale.Error: pass  # Fallback als de locale niet beschikbaar is (bv. op Windows)
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 
