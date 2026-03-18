@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 
 API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 
@@ -11,129 +11,98 @@ API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 def geocode(location):
     url = f"http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=1&appid={API_KEY}"
     res = requests.get(url).json()
-    if not res:
-        return None
-    return res[0]["lat"], res[0]["lon"], res[0]["name"]
+    return (res[0]["lat"], res[0]["lon"], res[0]["name"]) if res else None
 
-def get_weather(lat, lon):
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
+def get_weather_data(lat, lon):
+    # We halen de 5-daagse voorspelling op (bevat alle data die we nodig hebben)
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon Marc}&appid={API_KEY}&units=metric"
     return requests.get(url).json()
 
-def get_forecast(lat, lon):
-    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
-    return requests.get(url).json()
+def get_night_min(forecast_list, target_date):
+    """Zoekt de minimumtemperatuur van de nacht voorafgaand aan de target_date."""
+    night_temps = []
+    for item in forecast_list:
+        dt = datetime.fromtimestamp(item["dt"])
+        # We kijken naar temperaturen tussen 00:00 en 07:00 van de betreffende dag
+        if dt.date() == target_date.date() and 0 <= dt.hour <= 7:
+            night_temps.append(item["main"]["temp_min"])
+    
+    return min(night_temps) if night_temps else 7  # 7 is een veilige aanname als data ontbreekt
 
 def nsc_risk(cloud_cover, night_temp, hour):
     score = 0
     sun_factor = 1 - (cloud_cover / 100)
 
-    if sun_factor > 0.7:
-        score += 2
-    elif sun_factor > 0.4:
-        score += 1
+    # 1. Zonlicht factor (Suikeropbouw)
+    if sun_factor > 0.7: score += 2
+    elif sun_factor > 0.4: score += 1
 
-    if night_temp < 5:
-        score += 2
-    elif night_temp < 10:
-        score += 1
-    else:
-        score -= 1
+    # 2. Nachttemperatuur (Suikerverbruik)
+    if night_temp < 5: score += 2    # Vorst/kou: suiker blijft in het gras
+    elif night_temp < 10: score += 1
+    else: score -= 1                 # Warme nacht: gras verbruikt suikers om te groeien
 
-    if 12 <= hour <= 18:
-        score += 2
-    elif 8 <= hour < 12:
-        score += 1
-    elif 0 <= hour < 6:
-        score -= 1
+    # 3. Tijdstip (Dagcyclus)
+    if 12 <= hour <= 18: score += 2  # Hoogste concentratie in de middag
+    elif 8 <= hour < 12: score += 1
+    elif 0 <= hour < 6: score -= 1   # Laagste concentratie vlak voor zonsopgang
 
-    if score <= 1:
-        return "Laag risico", "green"
-    elif score <= 3:
-        return "Risico", "orange"
-    else:
-        return "Hoog risico", "red"
+    if score <= 1: return "Laag risico", "green"
+    elif score <= 3: return "Risico", "orange"
+    else: return "Hoog risico", "red"
 
 # -------------------------
 # UI
 # -------------------------
 
 st.set_page_config(page_title="NSC Gras Monitor", page_icon="🌱")
-st.title("🌱 NSC Risico in Gras")
+st.title("🌱 NSC Risico Monitor")
+st.caption("Voorspelling van suikergehalte in gras op basis van weerdata.")
 
-location = st.text_input("Geef een locatie in (bv. Brussel)", placeholder="Peer, BE")
+location = st.text_input("Locatie", placeholder="Bv. Brussel of Utrecht")
 
 if location:
     geo = geocode(location)
-
-    if geo is None:
-        st.error("Locatie niet gevonden")
+    if not geo:
+        st.error("Locatie niet gevonden.")
     else:
         lat, lon, name = geo
-        
-        # --- HUIDIG WEER ---
-        data = get_weather(lat, lon)
-        
-        if data.get("cod") != 200:
-            st.error("Kon weergegevens niet ophalen.")
-        else:
-            st.header(f"Actueel: {name}")
-            cloud = data["clouds"]["all"]
-            temp = data["main"]["temp"]
-            # We gebruiken de huidige temp even als 'nacht_temp' indicator voor de simpele berekening
-            # Of je kunt de min_temp van de dag gebruiken
-            night_temp = data["main"]["temp_min"] 
-            hour = datetime.now().hour
+        data = get_weather_data(lat, lon)
 
-            risk, color = nsc_risk(cloud, night_temp, hour)
-
-            # Visuele weergave van huidig risico
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Temperatuur", f"{temp}°C")
-                st.metric("Bewolking", f"{cloud}%")
+        if data.get("cod") == "200":
+            forecast_list = data["list"]
+            current = forecast_list[0]
             
-            with col2:
-                if color == "green":
-                    st.success(f"**{risk}**\n\nVeilig om te grazen.")
-                elif color == "orange":
-                    st.warning(f"**{risk}**\n\nLet op met gevoelige paarden.")
-                else:
-                    st.error(f"**{risk}**\n\nBeperk grazen.")
-
-            # --- VOORSPELLING VOOR KOMENDE UREN ---
+            # --- HUIDIG ---
+            st.subheader(f"Actueel in {name}")
+            curr_dt = datetime.fromtimestamp(current["dt"])
+            curr_night_min = get_night_min(forecast_list, curr_dt)
+            risk, color = nsc_risk(current["clouds"]["all"], curr_night_min, curr_dt.hour)
+            
+            st.select_slider("Huidig Risico Niveau", options=["Laag risico", "Risico", "Hoog risico"], value=risk, disabled=True)
+            
+            # --- TABEL VOORSPELLING ---
             st.divider()
-            st.subheader("Voorspelling komende 24 uur")
+            st.subheader("📅 Voorspelling komende 24 uur")
             
-            forecast_data = get_forecast(lat, lon)
-            
-            if forecast_data.get("cod") == "200":
-                forecast_list = []
+            table_data = []
+            # We tonen de komende 8 blokken (24 uur)
+            for item in forecast_list[:9]:
+                dt = datetime.fromtimestamp(item["dt"])
+                night_min = get_night_min(forecast_list, dt)
+                f_risk, f_color = nsc_risk(item["clouds"]["all"], night_min, dt.hour)
                 
-                # We pakken de eerste 8 datapunten (24 uur)
-                for item in forecast_data["list"][:8]:
-                    dt = datetime.fromtimestamp(item["dt"])
-                    f_hour = dt.hour
-                    f_temp = item["main"]["temp"]
-                    f_cloud = item["clouds"]["all"]
-                    
-                    # Bereken risico
-                    f_risk, f_color = nsc_risk(f_cloud, night_temp, f_hour)
-                    
-                    # Voeg emoji toe aan de tekst voor de tabel
-                    emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
-                    
-                    # Maak een rij voor de tabel
-                    forecast_list.append({
-                        "Tijdstip": dt.strftime('%H:%M'),
-                        "Risico": f"{emoji} {f_risk}",
-                        "Temp (°C)": f"{f_temp:.1f}",
-                        "Bewolking (%)": f_cloud
-                    })
-
-                # Toon de tabel in Streamlit
-                st.table(forecast_list)
-            else:
-                st.error("Kon de voorspelling niet ophalen.")
-
-            st.divider()
-            st.info("Deze voorspelling is een indicatie op basis van de huidige weersomstandigheden en is geen garantie.\nObserveer je paarden goed en schat in of ze kunnen grazen.")
+                emoji = "🟢" if f_color == "green" else "🟡" if f_color == "orange" else "🔴"
+                
+                table_data.append({
+                    "Tijdstip": dt.strftime('%a %H:%M'),
+                    "NSC Risico": f"{emoji} {f_risk}",
+                    "Temp": f"{item['main']['temp']:.1f}°C",
+                    "Nacht Min": f"{night_min:.1f}°C",
+                    "Wolken": f"{item['clouds']['all']}%"
+                })
+            
+            st.table(table_data)
+            st.info("**Uitleg:** Een koude nacht (< 5°C) gecombineerd met een zonnige dag zorgt voor het hoogste risico, omdat het gras wel suiker aanmaakt maar niet verbruikt om te groeien.")
+        else:
+            st.error("Kon geen weerdata ophalen.")
