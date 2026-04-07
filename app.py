@@ -57,8 +57,6 @@ def nsc_risk(cloud_cover, night_temp, hour, humidity, temp_current):
     # 4. TIJDSTIP (Cumulatief effect)
     if 14 <= hour <= 19:
         score += 2  # Piek aan het einde van de middag
-    elif 4 <= hour <= 8:
-        score -= 2  # Veiligste moment: vlak na zonsopgang
 
     # Risico bepaling (schaal is nu ruimer door extra factoren)
     if score <= 4: return "Laag risico", "green"
